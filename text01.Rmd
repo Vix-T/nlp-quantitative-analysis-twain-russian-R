@@ -1,0 +1,16 @@
+---
+title: "text01"
+author: "Kiss^2"
+date: "2024-04-15"
+output: html_document
+---
+
+```{r}
+# load data (still working on the best way to do this but here are some libraries that may help?)
+
+library(quanteda) 
+library(readtext)
+
+# this is the emergency hotfix branch!
+
+```
