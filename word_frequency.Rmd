@@ -1,0 +1,59 @@
+---
+title: "word_frequency"
+author: "Quan Dang"
+date: "2024-05-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r simple, include=FALSE}
+# reading in the frequencies txt file from the Stylo package, UTF-8 encoding needed for Cyrillic
+wordFreq <- read.table("table_with_frequencies.txt", sep=" ", header=T, encoding="UTF-8")
+
+# turning the index into a column
+wordFreq <- cbind(wordName = rownames(wordFreq), wordFreq)
+rownames(wordFreq) <- 1:nrow(wordFreq)
+
+# simple charts of each text with 20 most common words
+par(mfrow=c(2,3))
+barplot(wordFreq[1:20, 2], name=wordFreq[1:20, 1],
+        main="Translation 1", xlab="Word", ylab="Percentage of text")
+barplot(wordFreq[1:20, 3], name=wordFreq[1:20, 1],
+        main="Translation 2", xlab="Word", ylab="Percentage of text")
+barplot(wordFreq[1:20, 4], name=wordFreq[1:20, 1],
+        main="Translation 3", xlab="Word", ylab="Percentage of text")
+barplot(wordFreq[1:20, 5], name=wordFreq[1:20, 1],
+        main="Translation 4", xlab="Word", ylab="Percentage of text")
+barplot(wordFreq[1:20, 6], name=wordFreq[1:20, 1],
+        main="Translation 5", xlab="Word", ylab="Percentage of text")
+
+# the collective percentage of most used 1000 words 
+sum(wordFreq$one_twain)
+sum(wordFreq$two_twain)
+sum(wordFreq$three_twain)
+sum(wordFreq$four_twain)
+sum(wordFreq$five_twain)
+```
+## percentage of 1000 most common words in translations:
+### Translation 1:
+80.74109%
+
+### Translation 2:
+85.46636%
+
+### Translation 3:
+85.00925%
+
+### Translation 4:
+86.09046%
+
+### Translation 5:
+86.52966%
+
+
+```{r exploration, include=FALSE}
+
+```
