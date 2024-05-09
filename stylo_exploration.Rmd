@@ -19,3 +19,48 @@ stylo()
 # we should break down stylo functions
 
 ```
+
+
+
+```{r}
+#install.packages("udpipe")
+library(udpipe)
+# Download and load Russian language model
+ud_model <- udpipe_download_model(language = "russian")
+ud_model <- udpipe_load_model(ud_model$file_model)
+
+# Function to tokenize and lemmatize Russian text and save to a new file
+tokenize_lemmatize_and_save <- function(input_file, output_file) {
+  # Read text from input file
+  text <- readLines(input_file, warn = FALSE, encoding = "UTF-8")
+  
+  # Tokenize text
+  tokens <- udpipe_annotate(ud_model, x = text)
+  
+  # Lemmatize tokens
+  lemmas <- as.data.frame(tokens)$lemma
+  
+  # Write lemmatized text to output file
+  writeLines(lemmas, con = output_file, useBytes = TRUE, encoding = "UTF-8")
+}
+
+# Input and output file paths
+input_files <- c("Ru1.txt", "Ru2.txt", "Ru3.txt", "Ru4.txt", "Ru5.txt")
+output_files <- paste0("Ru_lemmatized_tokenized_", 1:5, ".txt")
+
+# Tokenize, lemmatize, and save each input file to new output files
+for (i in seq_along(input_files)) {
+  tokenize_lemmatize_and_save(input_files[i], output_files[i])
+  cat(sprintf("Tokenization and lemmatization complete for %s. Results saved to %s.\n", input_files[i], output_files[i]))
+}
+
+```
+
+
+
+
+
+
+
+
+
