@@ -8,8 +8,14 @@ output: html_document
 ```{r}
 # load data (still working on the best way to do this but here are some libraries that may help?)
 
-data <- read.delim(file.choose())
+library(stylo)
 
-head(data)
+```
+
+```{r}
+
+stylo()
+
+# we should break down stylo functions
 
 ```
