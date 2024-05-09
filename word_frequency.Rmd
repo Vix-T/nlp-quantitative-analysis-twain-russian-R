@@ -30,28 +30,28 @@ barplot(wordFreq[1:20, 5], name=wordFreq[1:20, 1],
 barplot(wordFreq[1:20, 6], name=wordFreq[1:20, 1],
         main="Translation 5", xlab="Word", ylab="Percentage of text")
 
-# the collective percentage of most used 1000 words 
-sum(wordFreq$one_twain)
-sum(wordFreq$two_twain)
-sum(wordFreq$three_twain)
-sum(wordFreq$four_twain)
-sum(wordFreq$five_twain)
+# the collective percentage of most used 5000 words according to stylo
+sum(wordFreq$braude_twain)
+sum(wordFreq$chukovsky_twain)
+sum(wordFreq$daruzes_twain)
+sum(wordFreq$engel.gardt_twain)
+sum(wordFreq$unknown_twain)
 ```
-## percentage of 1000 most common words in translations:
-### Translation 1:
-80.74109%
-
-### Translation 2:
-85.46636%
-
-### Translation 3:
-85.00925%
-
-### Translation 4:
+## percentage of 5000 most common words in translations:
+### Braude Translation:
 86.09046%
 
-### Translation 5:
+### Chukovsky Translation:
+85.00925%
+
+### Daruzes Translation:
 86.52966%
+
+### Engel Gardt Translation:
+80.74109%
+
+### Unknown Translation:
+85.46636%
 
 
 ```{r exploration, include=FALSE}
