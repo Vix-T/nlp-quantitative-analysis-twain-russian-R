@@ -83,6 +83,21 @@ print(cosine_similarity_matrix)
 ```
 
 
+```{r}
+# Compute pairwise cosine similarity
+cosine_similarity <- proxy::simil(dtm_matrix, method = "cosine")
+
+# Convert similarity matrix to a more readable format
+cosine_similarity_matrix <- as.matrix(cosine_similarity)
+rownames(cosine_similarity_matrix) <- files
+colnames(cosine_similarity_matrix) <- files
+
+# Ensure diagonal values are set to 1
+diag(cosine_similarity_matrix) <- 1
+
+# Print the cosine similarity matrix
+print(cosine_similarity_matrix)
+```
 
 
 
