@@ -5,19 +5,21 @@ date: "2024-04-15"
 output: html_document
 ---
 
-```{r}
+```{r setup, include=FALSE}
 # Install and load necessary libraries
 # install.packages("udpipe")
 # install.packages("text")
 # install.packages("proxy")
 # install.packages("tm")
 # install.packages("factoextra")
+# install.packages("stylo")
 
 library(udpipe)
 library(text)
 library(proxy)
 library(tm)
 library(factoextra)
+# library(stylo)
 
 ```
 
@@ -79,6 +81,15 @@ colnames(cosine_similarity_matrix) <- files
 print(cosine_similarity_matrix)
 
 ```
+
+
+
+
+
+
+
+
+
 
 
 
