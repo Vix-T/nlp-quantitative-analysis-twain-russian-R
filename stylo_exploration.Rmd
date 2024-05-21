@@ -5,17 +5,112 @@ date: "2024-04-15"
 output: html_document
 ---
 
-```{r}
-# load data (still working on the best way to do this but here are some libraries that may help?)
+```{r setup, include=FALSE}
+# Install and load necessary libraries
+# install.packages("udpipe")
+# install.packages("text")
+# install.packages("proxy")
+# install.packages("tm")
+# install.packages("factoextra")
+# install.packages("stylo")
 
-library(stylo)
+library(udpipe)
+library(text)
+library(proxy)
+library(tm)
+library(factoextra)
+# library(stylo)
 
 ```
 
 ```{r}
+# Download and load the UDPipe Russian model
+udpipe_download_model(language = "russian")
+# Load the UDPipe Russian model
+model <- udpipe_load_model("russian-gsd-ud-2.5-191206.udpipe")
 
-stylo()
+# Function to read and process text files
+process_text <- function(file) {
+  text <- tolower(readLines(file, warn = FALSE))
+  text <- paste(text, collapse = " ")
+  annotation <- udpipe_annotate(model, x = text)
+  annotated_data <- as.data.frame(annotation)
+  lemmatized_text <- annotated_data$lemma
+  return(lemmatized_text)
+}
 
-# we should break down stylo functions
+# List of files to process
+files <- c("Ru1.txt", "Ru2.txt", "Ru3.txt", "Ru4.txt", "Ru5.txt")
+
+# Load and process all text files
+lemmatized_texts <- lapply(files, process_text)
+
+# Create a Document-Term Matrix (DTM)
+corpus <- Corpus(VectorSource(lemmatized_texts))
+dtm <- DocumentTermMatrix(corpus, control = list(wordLengths = c(1, Inf)))
+
+# Convert DTM to a matrix
+dtm_matrix <- as.matrix(dtm)
+
+# Remove columns with zero variance
+dtm_matrix <- dtm_matrix[, apply(dtm_matrix, 2, var) != 0]
+```
+
+
+
+```{r}
+
+# Perform PCA
+pca <- prcomp(dtm_matrix, scale. = TRUE)
+
+# Visualize PCA results
+fviz_pca_ind(pca,
+             geom.ind = "point",
+             title = "PCA of Texts",
+             repel = TRUE)
+
+# Compute pairwise cosine similarity
+cosine_similarity <- proxy::simil(dtm_matrix, method = "cosine")
+
+# Convert similarity matrix to a more readable format
+cosine_similarity_matrix <- as.matrix(cosine_similarity)
+rownames(cosine_similarity_matrix) <- files
+colnames(cosine_similarity_matrix) <- files
+
+# Print the cosine similarity matrix
+print(cosine_similarity_matrix)
 
 ```
+
+
+```{r}
+# Compute pairwise cosine similarity
+cosine_similarity <- proxy::simil(dtm_matrix, method = "cosine")
+
+# Convert similarity matrix to a more readable format
+cosine_similarity_matrix <- as.matrix(cosine_similarity)
+rownames(cosine_similarity_matrix) <- files
+colnames(cosine_similarity_matrix) <- files
+
+# Ensure diagonal values are set to 1
+diag(cosine_similarity_matrix) <- 1
+
+# Print the cosine similarity matrix
+print(cosine_similarity_matrix)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
