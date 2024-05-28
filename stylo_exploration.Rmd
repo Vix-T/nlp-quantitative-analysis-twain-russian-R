@@ -26,78 +26,97 @@ library(factoextra)
 ```{r}
 # Download and load the UDPipe Russian model
 udpipe_download_model(language = "russian")
-# Load the UDPipe Russian model
 model <- udpipe_load_model("russian-gsd-ud-2.5-191206.udpipe")
 
-# Function to read and process text files
-process_text <- function(file) {
+# Load stopwords from file
+stopwords <- tolower(readLines("stopwords-ru.txt", warn = FALSE))
+
+# Function to read, process text files, and remove stopwords
+process_text <- function(file, stopwords = NULL) {
   text <- tolower(readLines(file, warn = FALSE))
   text <- paste(text, collapse = " ")
   annotation <- udpipe_annotate(model, x = text)
   annotated_data <- as.data.frame(annotation)
   lemmatized_text <- annotated_data$lemma
+  if (!is.null(stopwords)) {
+    # Remove stopwords
+    lemmatized_text <- lemmatized_text[!lemmatized_text %in% stopwords]
+  }
   return(lemmatized_text)
 }
 
 # List of files to process
 files <- c("Ru1.txt", "Ru2.txt", "Ru3.txt", "Ru4.txt", "Ru5.txt")
 
-# Load and process all text files
-lemmatized_texts <- lapply(files, process_text)
+# Process text files with stopwords
+lemmatized_texts_with_stopwords <- lapply(files, process_text)
 
-# Create a Document-Term Matrix (DTM)
-corpus <- Corpus(VectorSource(lemmatized_texts))
-dtm <- DocumentTermMatrix(corpus, control = list(wordLengths = c(1, Inf)))
+# Process text files without stopwords
+lemmatized_texts_without_stopwords <- lapply(files, process_text, stopwords = stopwords)
 
-# Convert DTM to a matrix
-dtm_matrix <- as.matrix(dtm)
-
-# Remove columns with zero variance
-dtm_matrix <- dtm_matrix[, apply(dtm_matrix, 2, var) != 0]
 ```
-
-
 
 ```{r}
 
-# Perform PCA
-pca <- prcomp(dtm_matrix, scale. = TRUE)
+# Function to create DTM and perform PCA
+create_dtm_and_pca <- function(lemmatized_texts) {
+  corpus <- Corpus(VectorSource(lemmatized_texts))
+  dtm <- DocumentTermMatrix(corpus, control = list(wordLengths = c(1, Inf)))
+  dtm_matrix <- as.matrix(dtm)
+  dtm_matrix <- dtm_matrix[, apply(dtm_matrix, 2, var) != 0]
+  pca <- prcomp(dtm_matrix, scale. = TRUE)
+  list(dtm_matrix = dtm_matrix, pca = pca, pca_data = pca$x)
+}
+
+# Create DTMs and perform PCA for both cases
+results_with_stopwords <- create_dtm_and_pca(lemmatized_texts_with_stopwords)
+results_without_stopwords <- create_dtm_and_pca(lemmatized_texts_without_stopwords)
 
 # Visualize PCA results
-fviz_pca_ind(pca,
+fviz_pca_ind(results_with_stopwords$pca,
              geom.ind = "point",
-             title = "PCA of Texts",
+             title = "PCA of Texts with Stopwords",
              repel = TRUE)
 
-# Compute pairwise cosine similarity
-cosine_similarity <- proxy::simil(dtm_matrix, method = "cosine")
-
-# Convert similarity matrix to a more readable format
-cosine_similarity_matrix <- as.matrix(cosine_similarity)
-rownames(cosine_similarity_matrix) <- files
-colnames(cosine_similarity_matrix) <- files
-
-# Print the cosine similarity matrix
-print(cosine_similarity_matrix)
+fviz_pca_ind(results_without_stopwords$pca,
+             geom.ind = "point",
+             title = "PCA of Texts without Stopwords",
+             repel = TRUE)
 
 ```
-
 
 ```{r}
-# Compute pairwise cosine similarity
-cosine_similarity <- proxy::simil(dtm_matrix, method = "cosine")
+# Compute and print cosine similarity
+compute_cosine_similarity <- function(matrix, files) {
+  cosine_similarity <- proxy::simil(matrix, method = "cosine")
+  cosine_similarity_matrix <- as.matrix(cosine_similarity)
+  rownames(cosine_similarity_matrix) <- files
+  colnames(cosine_similarity_matrix) <- files
+  diag(cosine_similarity_matrix) <- 1
+  return(cosine_similarity_matrix)
+}
 
-# Convert similarity matrix to a more readable format
-cosine_similarity_matrix <- as.matrix(cosine_similarity)
-rownames(cosine_similarity_matrix) <- files
-colnames(cosine_similarity_matrix) <- files
+# Compute cosine similarity for original DTM matrices
+cosine_similarity_with_stopwords <- compute_cosine_similarity(results_with_stopwords$dtm_matrix, files)
+cosine_similarity_without_stopwords <- compute_cosine_similarity(results_without_stopwords$dtm_matrix, files)
 
-# Ensure diagonal values are set to 1
-diag(cosine_similarity_matrix) <- 1
+# Compute cosine similarity for PCA-transformed data
+cosine_similarity_pca_with_stopwords <- compute_cosine_similarity(results_with_stopwords$pca_data, files)
+cosine_similarity_pca_without_stopwords <- compute_cosine_similarity(results_without_stopwords$pca_data, files)
 
-# Print the cosine similarity matrix
-print(cosine_similarity_matrix)
-```
+# Print cosine similarity matrices
+cat("Cosine Similarity Matrix (DTM) with Stopwords:\n")
+print(cosine_similarity_with_stopwords)
+
+cat("\nCosine Similarity Matrix (DTM) without Stopwords:\n")
+print(cosine_similarity_without_stopwords)
+
+cat("\nCosine Similarity Matrix (PCA) with Stopwords:\n")
+print(cosine_similarity_pca_with_stopwords)
+
+cat("\nCosine Similarity Matrix (PCA) without Stopwords:\n")
+print(cosine_similarity_pca_without_stopwords)
+
 
 
 
