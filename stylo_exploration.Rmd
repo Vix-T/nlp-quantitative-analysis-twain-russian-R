@@ -35,6 +35,7 @@ stopwords <- tolower(readLines("stopwords-ru.txt", warn = FALSE))
 process_text <- function(file, stopwords = NULL) {
   text <- tolower(readLines(file, warn = FALSE))
   text <- paste(text, collapse = " ")
+  text <- removePunctuation(text) # Remove punctuation
   annotation <- udpipe_annotate(model, x = text)
   annotated_data <- as.data.frame(annotation)
   lemmatized_text <- annotated_data$lemma
@@ -117,8 +118,40 @@ print(cosine_similarity_pca_with_stopwords)
 cat("\nCosine Similarity Matrix (PCA) without Stopwords:\n")
 print(cosine_similarity_pca_without_stopwords)
 
+```
 
+```{r}
+# Visualize PCA results with color
+# Define labels and colors for the documents
+labels <- files
+colors <- c("red", "blue", "green", "black", "orange")
 
+# Visualize PCA results with stopwords
+fviz_pca_ind(results_with_stopwords$pca,
+             geom.ind = "point",
+             title = "PCA of Texts with Stopwords",
+             repel = TRUE,
+             col.ind = labels, # Use document labels as color
+             palette = colors) + # Use colors defined above
+  theme_minimal()
+
+# Visualize PCA results without stopwords
+fviz_pca_ind(results_without_stopwords$pca, 
+             geom.ind = "point",
+             title = "PCA of Texts without Stopwords",
+             repel = TRUE,
+             col.ind = labels, # Use document labels as color
+             palette = colors) + # Use colors defined above
+  theme_minimal()
+```
+
+```{r}
+
+print(pca)
+print("###############")
+print(dtm_matrix_trans)
+
+```
 
 
 
