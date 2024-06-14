@@ -124,7 +124,7 @@ print(cosine_similarity_pca_without_stopwords)
 # Visualize PCA results with color
 # Define labels and colors for the documents
 labels <- files
-colors <- c("red", "blue", "green", "purple", "orange")
+colors <- c("red", "blue", "green", "black", "orange")
 
 # Visualize PCA results with stopwords
 fviz_pca_ind(results_with_stopwords$pca,
@@ -146,9 +146,11 @@ fviz_pca_ind(results_without_stopwords$pca,
 ```
 
 ```{r}
+
 print(pca)
 print("###############")
 print(dtm_matrix_trans)
+
 ```
 
 
